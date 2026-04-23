@@ -1,4 +1,5 @@
 ﻿using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 
 namespace Shazam.Application.Audio
 {
@@ -61,6 +62,20 @@ namespace Shazam.Application.Audio
             using var provider = new WaveFormatConversionProvider(mono, floatTo16Provider);
             // write new mono file (1 channel)
             WaveFileWriter.CreateWaveFile("output-mono.wav", provider);
+
+            // resample, keep all in consistant Hz
         }
+
+        // 11025 Hz??
+        public async Task<byte[]> ResampleAudio(Stream inputStream, int targetRate)
+        {
+            using var reader = new WaveFileReader(inputStream);
+            var resampler = new WdlResamplingSampleProvider(reader.ToSampleProvider(), targetRate);
+
+            using var outStream = new MemoryStream();
+            WaveFileWriter.WriteWavFileToStream(outStream, resampler.ToWaveProvider());
+            return outStream.ToArray();
+        }
+
     }
 }
