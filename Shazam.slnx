@@ -1,3 +1,5 @@
 <Solution>
-  <Project Path="Shazam.Application/Shazam.Application.csproj" />
+  <Folder Name="/Core/">
+    <Project Path="Shazam.Application/Shazam.Application.csproj" />
+  </Folder>
 </Solution>
