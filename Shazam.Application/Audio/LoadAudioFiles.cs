@@ -5,77 +5,66 @@ namespace Shazam.Application.Audio
 {
     public class LoadAudioFiles
     {
-        // TODO: seperate processes
-        public float[] LoadAudioSample()
+        public float[] ProcessAudioSample(string path)
         {
-            // decode audio file
-            // to keep simple at moment only will work on mp3 files
-            using var reader = new Mp3FileReader("audio.mp3");
-            using var pcmStream = WaveFormatConversionStream.CreatePcmStream(reader);
-            WaveFileWriter.CreateWaveFile("output.wav", pcmStream);
+            // mp3, wav
+            using var reader = new AudioFileReader(path);
 
-            // normalize
-            float max = 0;
-            
-            using var wavReader = new AudioFileReader("output.wav");
-            var buffer = new float[wavReader.WaveFormat.SampleRate];
+            ISampleProvider provider = reader;
+
+            // convert to mono, only one audio channel, no sense of space and direction in audio needed
+            if (reader.WaveFormat.Channels == 2)
+            {
+                provider = new StereoToMonoSampleProvider(provider)
+                {
+                    LeftVolume = 0.5f,
+                    RightVolume = 0.5f
+                };
+            }
+
+            // // resample, keep all in consistant Hz
+            int targetSampleRate = 16000;
+            if (provider.WaveFormat.SampleRate != targetSampleRate)
+            {
+                provider = new WdlResamplingSampleProvider(provider, targetSampleRate);
+            }
+
+            // read all samples into memory
+            // find max peak
+            List<float> samples = new List<float>();
+            float[] buffer = new float[4096];
 
             int read;
+            float max = 0;
 
-            // find max peak
-            do
+            while ((read = provider.Read(buffer, 0, buffer.Length)) > 0)
             {
-                read = wavReader.Read(buffer, 0, buffer.Length);
-
                 for (int i = 0; i < read; i++)
                 {
-                    var abs = Math.Abs(buffer[i]);
+                    float sample = buffer[i];
+                    samples.Add(sample);
 
+                    float abs = Math.Abs(sample);
                     if (abs > max)
                     {
                         max = abs;
                     }
                 }
             }
-            while (read > 0);
 
-            if (max == 0 || max > 1.0f)
+            // normalize
+            if (max > 0)
             {
-                throw new InvalidOperationException("File can not be normalized");
+                float scale = 1.0f / max;
+
+                for (int i = 0; i < samples.Count; i++)
+                {
+                    samples[i] *= scale;
+                }
             }
-            // rewind and amplify
-            wavReader.Position = 0;
-            wavReader.Volume = 1.0f / max;
 
-            // write to new wav file
-            WaveFileWriter.CreateWaveFile("output-normalized.wav", wavReader);
+            return samples.ToArray();
 
-            // convert to mono, only one audio channel, no sense of space and direction in audio needed
-            const int Khz = 44100;
-            // 44.1 khz, 16 bit, 1 channel
-            var mono = new WaveFormat(Khz, 1);
-
-            var normalizedWavReader = new WaveFileReader("output-normalized.wav");
-            // converting input to 16 bit pcm
-            var floatTo16Provider = new WaveFloatTo16Provider(normalizedWavReader);
-
-            using var provider = new WaveFormatConversionProvider(mono, floatTo16Provider);
-            // write new mono file (1 channel)
-            WaveFileWriter.CreateWaveFile("output-mono.wav", provider);
-
-            // resample, keep all in consistant Hz
         }
-
-        // 11025 Hz??
-        public async Task<byte[]> ResampleAudio(Stream inputStream, int targetRate)
-        {
-            using var reader = new WaveFileReader(inputStream);
-            var resampler = new WdlResamplingSampleProvider(reader.ToSampleProvider(), targetRate);
-
-            using var outStream = new MemoryStream();
-            WaveFileWriter.WriteWavFileToStream(outStream, resampler.ToWaveProvider());
-            return outStream.ToArray();
-        }
-
     }
 }
