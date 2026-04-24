@@ -57,7 +57,7 @@ namespace Shazam.Application.Audio
             float[] window = new float[fftSize];
             for (int n = 0; n < fftSize; n++)
             {
-                window[n] = 0.5 * (1 - MathF.Cos(2 * MathF.PI * n / (fftSize - 1)));
+                window[n] = 0.5f * (1 - MathF.Cos(2 * MathF.PI * n / (fftSize - 1)));
             }
             return window;
         }
