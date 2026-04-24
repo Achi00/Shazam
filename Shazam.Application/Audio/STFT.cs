@@ -1,4 +1,6 @@
-﻿using System.Drawing;
+﻿using NAudio.Dsp;
+using System.Drawing;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Shazam.Application.Audio
 {
@@ -15,7 +17,7 @@ namespace Shazam.Application.Audio
             for (int frame = 0; frame < frameCount; frame++)
             {
                 int offset = frame * hopSize;
-                double[] windowed = new double[fftSize];
+                float[] windowed = new float[fftSize];
 
                 // apply Hann window
                 for (int i = 0; i < fftSize; i++)
@@ -23,18 +25,39 @@ namespace Shazam.Application.Audio
                     windowed[i] = samples[offset + i] * hannWindow[i];
                 }
 
+                // put windowed float[] into NAudio Complex[] to generate FFT
+                var buffer = new Complex[fftSize];
+
+                for (int i = 0; i < fftSize; i++)
+                {
+                    // real signal
+                    buffer[i].X = windowed[i];
+                    // imaginary input
+                    buffer[i].Y = 0f;
+                }
                 // FFT
+                // m = log2(fftSize)
+                int m = (int)Math.Log2(fftSize);
+                FastFourierTransform.FFT(true, m, buffer);
+
+                // extract magnitudes for positive frequencies only
+                for (int i = 0; i < fftSize; i++)
+                {
+                    float real = buffer[i].X;
+                    float imaginary = buffer[i].Y;
+                    spectrogram[frame, i] = MathF.Sqrt(real * real + imaginary * imaginary);
+                }
             }
 
             return spectrogram;
         }
 
-        private double[] ComputeHannWindow(int fftSize)
+        private float[] ComputeHannWindow(int fftSize)
         {
-            double[] window = new double[fftSize];
+            float[] window = new float[fftSize];
             for (int n = 0; n < fftSize; n++)
             {
-                window[n] = 0.5 * (1 - Math.Cos(2 * Math.PI * n / (fftSize - 1)));
+                window[n] = 0.5 * (1 - MathF.Cos(2 * MathF.PI * n / (fftSize - 1)));
             }
             return window;
         }
