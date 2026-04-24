@@ -31,6 +31,9 @@ namespace Shazam.Application.Audio
 
             // read all samples into memory
             // find max peak
+            // TESTING
+            // TODO: change list float, avoid list growth memory allocation and GC pressure
+            // instead of list, chunk processing? read - process - discard????
             List<float> samples = new List<float>();
             float[] buffer = new float[4096];
 
