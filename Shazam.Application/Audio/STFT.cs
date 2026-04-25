@@ -1,11 +1,12 @@
 ﻿using NAudio.Dsp;
-using System.Drawing;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace Shazam.Application.Audio
 {
     public class STFT
     {
+        // as default 1 frame on every ~30 ms
+        // each frame has 512 frequency between 0-8000 Hz
+        // each bin 8000 / 512 = 15.6 Hz
         public float[,] ComputeSpectrogram(float[] samples, int fftSize = 1024, int hopSize = 512)
         {
             int frameCount = (samples.Length - fftSize) / hopSize + 1;
@@ -41,7 +42,7 @@ namespace Shazam.Application.Audio
                 FastFourierTransform.FFT(true, m, buffer);
 
                 // extract magnitudes for positive frequencies only
-                for (int i = 0; i < fftSize; i++)
+                for (int i = 0; i < fftSize / 2; i++)
                 {
                     float real = buffer[i].X;
                     float imaginary = buffer[i].Y;

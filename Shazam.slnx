@@ -2,4 +2,7 @@
   <Folder Name="/Core/">
     <Project Path="Shazam.Application/Shazam.Application.csproj" />
   </Folder>
+  <Folder Name="/Presentation/">
+    <Project Path="Shazam.UI/Shazam.UI.csproj" Id="e479d0f7-1622-41af-8dc0-c957c305e298" />
+  </Folder>
 </Solution>
