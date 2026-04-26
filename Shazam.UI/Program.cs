@@ -1,4 +1,5 @@
 ﻿using Shazam.Application.Audio;
+using Shazam.Application.Spectogram;
 
 var loader = new LoadAudioFiles();
 float[] samples = loader.ProcessAudioSample("D:\\Csharp\\Shazam\\Shazam.Application\\Audio\\audio.mp3");
