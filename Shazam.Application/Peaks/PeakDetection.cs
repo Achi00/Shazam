@@ -2,7 +2,9 @@
 {
     public class PeakDetection
     {
-        int timeRadius = 5;
-        int freqRadius = 10;
+        public List<(int time, int freq)> FindPeaks(List<float[]> spectrogram)
+        {
+            return [];
+        }
     }
 }
