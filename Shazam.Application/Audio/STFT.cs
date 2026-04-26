@@ -46,7 +46,10 @@ namespace Shazam.Application.Audio
                 {
                     float real = buffer[i].X;
                     float imaginary = buffer[i].Y;
-                    spectrogram[frame, i] = MathF.Sqrt(real * real + imaginary * imaginary);
+                    // calulate magnitude and convert indo db
+                    float magnitude = MathF.Sqrt(real * real + imaginary * imaginary);
+                    // avoid -infinity
+                    spectrogram[frame, i] = 20f * MathF.Log10(magnitude + 1e-10f);
                 }
             }
 
