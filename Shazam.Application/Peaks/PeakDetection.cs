@@ -4,6 +4,7 @@
     {
         public List<(int time, int freq)> FindPeaks(float[,] spectrogram)
         {
+            // TODO: tune it later
             int timeRadius = 5;
             int freqRadius = 10;
             float threshold = -60f;
