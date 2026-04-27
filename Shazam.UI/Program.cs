@@ -32,13 +32,15 @@ Console.WriteLine($"Magnitude range: {min:F4} - {max:F4}");
 var pd = new PeakDetection();
 var peaks = pd.FindPeaks(spectrogram);
 
-Console.WriteLine($"peaks count {peaks.Count}");
+Console.WriteLine($"peaks count: {peaks.Count}");
 var peakPearing = new PeakPairing();
 
 
-var peared = peakPearing.Pear(peaks);
+var fingerPrints = peakPearing.Pear(peaks);
 
-foreach (var item in peared)
-{
-    Console.WriteLine($"Freq1: {item.Freq1}, Freq2: {item.Freq2}, Delta: {item.DeltaTime}");
-}
+Console.WriteLine($"fingerPrints count: {fingerPrints.Count}");
+
+//foreach (var item in fingerPrints)
+//{
+//    Console.WriteLine($"Freq1: {item.Freq1}, Freq2: {item.Freq2}, Delta: {item.DeltaTime}");
+//}

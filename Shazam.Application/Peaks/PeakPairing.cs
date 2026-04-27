@@ -22,7 +22,7 @@
 
                 int pairs = 0;
 
-                for (int j = 0; j < ordered.Count && pairs < pairsPerAnchor; j++)
+                for (int j = i + 1; j < ordered.Count && pairs < pairsPerAnchor; j++)
                 {
                     var target = ordered[j];
                     // calculate time difference between two
@@ -34,7 +34,7 @@
                     }
                     if (delta > maxDelta)
                     {
-                        continue;
+                        break;
                     }
 
                     fingerprints.Add(new Fingerprint(anchor.freq, target.freq, delta, anchor.time));
