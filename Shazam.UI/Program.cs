@@ -1,4 +1,5 @@
 ﻿using Shazam.Application.Audio;
+using Shazam.Application.Peaks;
 using Shazam.Application.Spectogram;
 
 var loader = new LoadAudioFiles();
@@ -27,3 +28,8 @@ for (int f = 0; f < frameCount; f++)
 }
 
 Console.WriteLine($"Magnitude range: {min:F4} - {max:F4}");
+
+var pd = new PeakDetection();
+var peaks = pd.FindPeaks(spectrogram);
+
+Console.WriteLine($"peaks count {peaks.Count}");

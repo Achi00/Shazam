@@ -2,21 +2,23 @@
 {
     public class PeakDetection
     {
-        public List<(int time, int freq)> FindPeaks(List<float[]> spectrogram)
+        public List<(int time, int freq)> FindPeaks(float[,] spectrogram)
         {
             int timeRadius = 5;
             int freqRadius = 10;
-            float threshold = -5f;
+            float threshold = -60f;
+
+            int frameCount = spectrogram.GetLength(0);
+            int binCount = spectrogram.GetLength(1);
 
             var peaks = new List<(int, int)>();
             // goes front in music play
-            for (int t = timeRadius; t < spectrogram.Count - timeRadius; t++)
+            for (int t = timeRadius; t < frameCount - timeRadius; t++)
             {
-                var frame = spectrogram[t];
                 // local max peak
-                for (int f = freqRadius; f < frame.Length; f++)
+                for (int f = freqRadius; f < binCount - freqRadius; f++)
                 {
-                    var current = frame[f];
+                    float current = spectrogram[t, f];
 
                     if (current < threshold)
                     {
@@ -28,8 +30,6 @@
                     // find neighbor frames
                     for (int dt = -timeRadius; dt <= timeRadius && isPeak; dt++)
                     {
-                        var neighborFrame = spectrogram[t + dt];
-
                         for (int df = -freqRadius; df <= freqRadius; df++)
                         {
                             if (dt == 0 && df == 0)
@@ -37,7 +37,7 @@
                                 continue;
                             }
 
-                            if (neighborFrame[f + df] > current)
+                            if (spectrogram[t + dt, f + df] > current)
                             {
                                 isPeak = false;
                                 break;
