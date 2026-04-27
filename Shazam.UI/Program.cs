@@ -33,3 +33,12 @@ var pd = new PeakDetection();
 var peaks = pd.FindPeaks(spectrogram);
 
 Console.WriteLine($"peaks count {peaks.Count}");
+var peakPearing = new PeakPairing();
+
+
+var peared = peakPearing.Pear(peaks);
+
+foreach (var item in peared)
+{
+    Console.WriteLine($"Freq1: {item.Freq1}, Freq2: {item.Freq2}, Delta: {item.DeltaTime}");
+}
