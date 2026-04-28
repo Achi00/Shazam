@@ -44,3 +44,24 @@ Console.WriteLine($"fingerPrints count: {fingerPrints.Count}");
 //{
 //    Console.WriteLine($"Freq1: {item.Freq1}, Freq2: {item.Freq2}, Delta: {item.DeltaTime}");
 //}
+
+// songs table for testing
+Dictionary<int, string> songs = new();
+int songId = songs.Count;
+
+songs[songId] = "Master of Puppets (Remastered)";
+// build indexes
+Dictionary<uint, List<(int songId, int anchorTime)>> index = new();
+
+foreach (var item in fingerPrints)
+{
+    if (!index.TryGetValue(item.Hash, out var list))
+    {
+        list = new List<(int songId, int anchorTime)>();
+        index[item.Hash] = list;
+    }
+
+    list.Add((songId, item.AnchorTime));
+}
+
+Console.WriteLine($"index count: {index.Count}");
