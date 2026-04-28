@@ -1,4 +1,6 @@
-﻿namespace Shazam.Application.Peaks
+﻿using Shazam.Application.Hashing;
+
+namespace Shazam.Application.Peaks
 {
     public class PeakPairing
     {
@@ -46,6 +48,4 @@
             return fingerprints;
         }
     }
-
-    public record Fingerprint(int Freq1, int Freq2, int DeltaTime, int AnchorTime);
 }
