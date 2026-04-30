@@ -98,7 +98,7 @@ foreach (var file in files)
 Console.WriteLine($"index count: {index.Count}");
 
 // cropped audio file, testing sound matching
-// votes: (songId, offset) → count
+// votes: (songId, time offset) -> count
 var votes = new Dictionary<(int songId, int offset), int>();
 
 foreach (var fp in cutFingerPrints)
