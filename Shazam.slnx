@@ -3,6 +3,10 @@
     <Project Path="Shazam.Application/Shazam.Application.csproj" />
     <Project Path="Shazam.Domain/Shazam.Domain.csproj" Id="aa2962e2-5a62-495c-8cc6-3b220b640f61" />
   </Folder>
+  <Folder Name="/Infrastructure/">
+    <Project Path="Shazam.Infrastructure/Shazam.Infrastructure.csproj" Id="34d84880-7c27-4fff-ae42-2ea5572a6a77" />
+    <Project Path="Shazam.Persistence/Shazam.Persistence.csproj" Id="644ba9ce-08dc-46cb-8e06-f86cfd010655" />
+  </Folder>
   <Folder Name="/Presentation/">
     <Project Path="Shazam.UI/Shazam.UI.csproj" Id="e479d0f7-1622-41af-8dc0-c957c305e298" />
   </Folder>
