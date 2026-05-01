@@ -104,7 +104,9 @@ var votes = new Dictionary<(int songId, int offset), int>();
 foreach (var fp in cutFingerPrints)
 {
     if (!index.TryGetValue(fp.Hash, out var matches))
+    {
         continue;
+    }
 
     foreach (var (matchedSongId, storedAnchorTime) in matches)
     {
@@ -112,7 +114,9 @@ foreach (var fp in cutFingerPrints)
         var key = (matchedSongId, offset);
 
         if (!votes.ContainsKey(key))
+        {
             votes[key] = 0;
+        }
 
         votes[key]++;
     }

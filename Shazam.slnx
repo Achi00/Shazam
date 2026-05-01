@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/Core/">
     <Project Path="Shazam.Application/Shazam.Application.csproj" />
+    <Project Path="Shazam.Domain/Shazam.Domain.csproj" Id="aa2962e2-5a62-495c-8cc6-3b220b640f61" />
   </Folder>
   <Folder Name="/Presentation/">
     <Project Path="Shazam.UI/Shazam.UI.csproj" Id="e479d0f7-1622-41af-8dc0-c957c305e298" />
