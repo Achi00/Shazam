@@ -105,3 +105,9 @@ using Shazam.Application.Services;
 var youtubeService = new ProcessYoutube();
 
 var (song, streamInfo) = await youtubeService.GetMetaDataAsync("https://www.youtube.com/watch?v=zBUx6zTxr98");
+
+// testing, random file names
+string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
+
+// donwload audio
+await youtubeService.DownloadStreamAsync(streamInfo, fileName);

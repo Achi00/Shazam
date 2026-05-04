@@ -12,6 +12,16 @@ namespace Shazam.Application.Services
 
         public async Task DownloadStreamAsync(IStreamInfo streamInfo, string filePath)
         {
+            // get dir name
+            var directory = Path.GetDirectoryName(filePath);
+            // create dir if it does not exists
+            if (!string.IsNullOrEmpty(directory) && !Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+
+            Console.WriteLine($"Downloading audio file at: {directory}");
+
             await _youtubeClient.Videos.Streams.DownloadAsync(streamInfo, filePath);
         }
 
@@ -22,6 +32,7 @@ namespace Shazam.Application.Services
                 throw new ArgumentException("Youtube video url is required");
             }
 
+            Console.WriteLine("Collectiong songs metadata");
             // get video metadata
             var video = await _youtubeClient.Videos.GetAsync(url);
 
