@@ -14,7 +14,7 @@ namespace Shazam.Infrastructure.Repositories
         {
             _context = context;
         }
-        public void AddSong(Song song, CancellationToken ct = default)
+        public void AddSong(Song song)
         {
             _context.Songs.Add(song);
         }
@@ -24,24 +24,19 @@ namespace Shazam.Infrastructure.Repositories
             return await _context.Songs.AsNoTracking().ToListAsync(ct);
         }
 
-        public Task<Song?> GetForUpdateAsync(int id, CancellationToken ct = default)
+        public async Task<Song?> GetForUpdateAsync(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            return await _context.Songs.FirstOrDefaultAsync(s => s.Id == id, ct);
         }
 
-        public Task<Song> GetSongById(int id, CancellationToken ct = default)
+        public async Task<Song?> GetSongById(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            return await _context.Songs.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
         }
 
-        public void RemoveSong(int id, CancellationToken ct = default)
+        public void RemoveSong(Song song)
         {
-            throw new NotImplementedException();
-        }
-
-        public Task<Song> UpdateSong(int id, CancellationToken ct = default)
-        {
-            throw new NotImplementedException();
+            _context.Songs.Remove(song);
         }
     }
 }
