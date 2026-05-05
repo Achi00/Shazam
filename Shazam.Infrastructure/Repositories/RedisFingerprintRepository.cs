@@ -25,12 +25,6 @@ namespace Shazam.Infrastructure.Repositories
             {
                 var key = prefix + hash;
                 var existing = await _cacheService.GetAsync<List<FingerprintEntry>>(key);
-
-                if (existing == null)
-                {
-                    throw new Exception("no existing fingerprint value");
-                }
-
                 existing.Add(new FingerprintEntry { SongId = songId, TimeOffsetMs = offsetMs });
 
                 await _cacheService.SetAsync(key, existing);
