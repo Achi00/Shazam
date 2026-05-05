@@ -11,4 +11,7 @@
     <Project Path="Shazam.API/Shazam.API.csproj" Id="97525c22-492f-4a3e-9e30-1571b7b75cf6" />
     <Project Path="Shazam.UI/Shazam.UI.csproj" Id="e479d0f7-1622-41af-8dc0-c957c305e298" />
   </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="docker-compose.yml" />
+  </Folder>
 </Solution>
