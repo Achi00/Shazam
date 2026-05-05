@@ -9,7 +9,7 @@ namespace Shazam.Persistence.Context
         {
         }
 
-        public DbSet<Song> songs { get; set; }
+        public DbSet<Song> Songs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
