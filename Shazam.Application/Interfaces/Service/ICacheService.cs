@@ -1,4 +1,4 @@
-﻿namespace Shazam.Application.Interfaces.Caching
+﻿namespace Shazam.Application.Interfaces.Services
 {
     public interface ICacheService
     {

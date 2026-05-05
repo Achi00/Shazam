@@ -109,5 +109,5 @@ var (song, streamInfo) = await youtubeService.GetMetaDataAsync("https://www.yout
 // testing, random file names
 string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
 
-// donwload audio
+// download audio
 await youtubeService.DownloadStreamAsync(streamInfo, fileName);

@@ -1,4 +1,4 @@
-﻿using Shazam.Application.Interfaces.Caching;
+﻿using Shazam.Application.Interfaces.Services;
 
 namespace Shazam.Infrastructure.Redis
 {
