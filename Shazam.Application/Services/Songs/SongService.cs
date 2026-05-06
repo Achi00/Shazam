@@ -1,5 +1,4 @@
 ﻿using Mapster;
-using Microsoft.EntityFrameworkCore;
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Exceptions;
 using Shazam.Application.Interfaces;
@@ -54,14 +53,32 @@ namespace Shazam.Application.Services.Songs
             return song.Adapt<SongResponse>();
         }
 
-        public Task RemoveSongAsync(int id, CancellationToken ct = default)
+        public async Task RemoveSongAsync(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var song = await _songRepository.GetForUpdateAsync(id, ct);
+
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with id: {id} was not found");
+            }
+
+            _songRepository.RemoveSong(song);
+
+            await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        public Task UpdateSongAsync(int id, CancellationToken ct = default)
+        public async Task UpdateSongAsync(int id, UpdateSongRequest dto, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var song = await _songRepository.GetForUpdateAsync(id, ct);
+
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with id: {id} was not found");
+            }
+
+            dto.Adapt(song);
+
+            await _unitOfWork.SaveChangesAsync(ct);
         }
     }
 }
