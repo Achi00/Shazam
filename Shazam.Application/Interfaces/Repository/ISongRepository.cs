@@ -10,5 +10,6 @@ namespace Shazam.Application.Interfaces.Repository
         void AddSong(Song song);
         void RemoveSong(Song song);
         Task<Song?> GetForUpdateAsync(int id, CancellationToken ct = default);
+        Task<bool> ExistsByYoutubeUrlAsync(string url, CancellationToken ct = default);
     }
 }

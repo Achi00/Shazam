@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Shazam.Application.DTOs.Song;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Domain.Entity;
 using Shazam.Persistence.Context;
@@ -32,6 +31,11 @@ namespace Shazam.Infrastructure.Repositories
         public async Task<Song?> GetSongById(int id, CancellationToken ct = default)
         {
             return await _context.Songs.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        }
+
+        public async Task<bool> ExistsByYoutubeUrlAsync(string url, CancellationToken ct = default)
+        {
+            return await _context.Songs.AsNoTracking().AnyAsync(s => s.YoutubeUrl == url, ct);
         }
 
         public void RemoveSong(Song song)

@@ -1,9 +1,12 @@
-﻿using Shazam.Application.DTOs.Song;
+﻿using Mapster;
+using Shazam.Application.DTOs.Song;
+using Shazam.Application.Exceptions;
 using Shazam.Application.Interfaces;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service.Song;
+using Shazam.Domain.Entity;
 
-namespace Shazam.Application.Services.Song
+namespace Shazam.Application.Services.Songs
 {
     public class SongService : ISongService
     {
@@ -15,9 +18,22 @@ namespace Shazam.Application.Services.Song
             _songRepository = songRepository;
             _unitOfWork = unitOfWork;
         }
-        public Task<SongResponse> AddSongAsync(AddSongRequest dto, CancellationToken ct = default)
+        public async Task<SongResponse> AddSongAsync(AddSongRequest dto, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var song = dto.Adapt<Song>();
+
+            var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
+
+            if (exists)
+            {
+                throw new AlreadyExistsException($"Song with Url: {song.YoutubeUrl} already added in database");
+            }
+
+            _songRepository.AddSong(song);
+
+            await _unitOfWork.SaveChangesAsync(ct);
+
+            return song.Adapt<SongResponse>();
         }
 
         public Task<SongResponse> GetAllAsync(CancellationToken ct = default)
