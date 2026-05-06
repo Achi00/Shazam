@@ -42,9 +42,16 @@ namespace Shazam.Application.Services.Songs
             return await _songRepository.GetAllSongs(ct);
         }
 
-        public Task<IEnumerable<SongResponse>> GetByIdAsync(int id, CancellationToken ct = default)
+        public async Task<SongResponse> GetByIdAsync(int id, CancellationToken ct = default)
         {
-            throw new NotImplementedException();
+            var song = await _songRepository.GetSongById(id, ct);
+
+            if (song == null)
+            {
+                throw new NotFoundException($"Song with id: {id} was not found");
+            }
+
+            return song.Adapt<SongResponse>();
         }
 
         public Task RemoveSongAsync(int id, CancellationToken ct = default)
