@@ -65,10 +65,5 @@ namespace Shazam.Application.Spectogram
             }
             return window;
         }
-
-        private void ProcessSTFT(double[] signal, int windowSize, int hopSize)
-        {
-
-        }
     }
 }

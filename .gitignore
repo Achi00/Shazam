@@ -481,3 +481,11 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 /Shazam.Application/Audio/audio.mp3
+/Shazam.Application/Audio/audio.mp3
+/Shazam.Application/Audio/audio-crop.mp3
+/Shazam.Application/Audio/ACDC-Thunderstruck(Official Video).mp3
+/Shazam.Application/Audio/Master of Puppets (Remastered).mp3
+/Shazam.Application/Audio/Michael Jackson - Billie Jean (Official Video).mp3
+/Shazam.Application/Audio/OriginalFiles/ACDC-Thunderstruck(Official Video).mp3
+/Shazam.Application/Audio/OriginalFiles/Master of Puppets (Remastered).mp3
+/Shazam.Application/Audio/OriginalFiles/Michael Jackson - Billie Jean (Official Video).mp3
