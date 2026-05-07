@@ -109,6 +109,11 @@ var youtubeService = new ProcessYoutube();
 
 var (song, streamInfo) = await youtubeService.GetMetaDataAsync("https://www.youtube.com/watch?v=zBUx6zTxr98");
 
+Console.WriteLine(song.Title);
+Console.WriteLine(song.ThumbnailUrl);
+Console.WriteLine(song.Author);
+Console.WriteLine(song.Duration);
+
 // testing, random file names
 string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
 
