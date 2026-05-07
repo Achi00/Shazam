@@ -105,7 +105,7 @@ using Shazam.Application.Peaks;
 using Shazam.Application.Services;
 using Shazam.Application.Spectogram;
 
-var youtubeService = new ProcessYoutube();
+var youtubeService = new ProcessYoutubeService();
 
 var (song, streamInfo) = await youtubeService.GetMetaDataAsync("https://www.youtube.com/watch?v=zBUx6zTxr98");
 

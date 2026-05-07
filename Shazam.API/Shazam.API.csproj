@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Shazam.Application\Shazam.Application.csproj" />
+    <ProjectReference Include="..\Shazam.Infrastructure\Shazam.Infrastructure.csproj" />
     <ProjectReference Include="..\Shazam.Persistence\Shazam.Persistence.csproj" />
   </ItemGroup>
 

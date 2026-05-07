@@ -12,15 +12,27 @@ namespace Shazam.Application.Services.Songs
     {
         private readonly ISongRepository _songRepository;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ProcessYoutubeService _youtubeService;
 
-        public SongService(ISongRepository songRepository, IUnitOfWork unitOfWork)
+        public SongService(ISongRepository songRepository, IUnitOfWork unitOfWork, ProcessYoutubeService youtubeService)
         {
             _songRepository = songRepository;
             _unitOfWork = unitOfWork;
+            _youtubeService = youtubeService;
         }
-        public async Task<SongResponse> AddSongAsync(AddSongRequest dto, CancellationToken ct = default)
+        //TODO: first store metadata only in database, next fingerprint
+        public async Task<SongResponse> AddSongAsync(string url, CancellationToken ct = default)
         {
-            var song = dto.Adapt<Song>();
+            // get add data from youtube url
+            var (song, streamInfo) = await _youtubeService.GetMetaDataAsync(url, ct);
+            //var song = dto.Adapt<Song>();
+
+            // TODO: fix path later
+            string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
+
+            /// TODO: remove audio later, clean up!!!
+            // download audio
+            await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
 
             var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
 
