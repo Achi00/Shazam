@@ -1,6 +1,4 @@
-﻿using Mapster;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Interfaces.Service.Song;
 
