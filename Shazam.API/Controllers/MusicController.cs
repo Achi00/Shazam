@@ -10,7 +10,7 @@ namespace Shazam.API.Controllers
         [HttpPost]
         public IActionResult StoreMusic()
         {
-            return Ok();
+            return Ok("hello");
         }
     }
 }
