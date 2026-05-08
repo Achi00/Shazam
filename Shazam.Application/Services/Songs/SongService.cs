@@ -26,6 +26,12 @@ namespace Shazam.Application.Services.Songs
             // get add data from youtube url
             var (song, streamInfo) = await _youtubeService.GetMetaDataAsync(url, ct);
             //var song = dto.Adapt<Song>();
+            var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
+
+            if (exists)
+            {
+                throw new AlreadyExistsException($"Song with Url: {song.YoutubeUrl} already added in database");
+            }
 
             // TODO: fix path later
             string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
@@ -34,12 +40,7 @@ namespace Shazam.Application.Services.Songs
             // download audio
             await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
 
-            var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
-
-            if (exists)
-            {
-                throw new AlreadyExistsException($"Song with Url: {song.YoutubeUrl} already added in database");
-            }
+            
 
             _songRepository.AddSong(song);
 
