@@ -1,10 +1,12 @@
 ﻿using Mapster;
+using Shazam.Application.Audio;
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Exceptions;
 using Shazam.Application.Interfaces;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service.Song;
-using Shazam.Domain.Entity;
+using Shazam.Application.Peaks;
+using Shazam.Application.Spectogram;
 
 namespace Shazam.Application.Services.Songs
 {
@@ -23,6 +25,7 @@ namespace Shazam.Application.Services.Songs
         //TODO: first store metadata only in database, next fingerprint
         public async Task<SongResponse> AddSongAsync(string url, CancellationToken ct = default)
         {
+            //TODO: add sql transaction and rollbacks on fail
             // get add data from youtube url
             var (song, streamInfo) = await _youtubeService.GetMetaDataAsync(url, ct);
             //var song = dto.Adapt<Song>();
@@ -40,11 +43,30 @@ namespace Shazam.Application.Services.Songs
             // download audio
             await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
 
-            
-
             _songRepository.AddSong(song);
 
             await _unitOfWork.SaveChangesAsync(ct);
+
+            // generate fingerprints
+            var loader = new LoadAudioFiles();
+            // TODO: fix path later, now for testing!!!
+            float[] samples = loader.ProcessAudioSample($"D:{fileName}");
+
+            // generate spectpgram
+            var stft = new STFT();
+            float[,] spectogram = stft.ComputeSpectrogram(samples);
+
+            // detect audio peaks
+            var pd = new PeakDetection();
+            var peaks = pd.FindPeaks(spectogram);
+
+            Console.WriteLine($"Peaks count: {peaks.Count}");
+
+            // connect peaks, generate audio fingerprint
+            var peakPearing = new PeakPairing();
+            var fingerPrints = peakPearing.Pear(peaks);
+
+            Console.WriteLine($"Fingerprints count: {fingerPrints.Count}");
 
             return song.Adapt<SongResponse>();
         }
