@@ -15,15 +15,17 @@ namespace Shazam.Application.Services.Songs
     {
         private readonly ISongRepository _songRepository;
         private readonly IAudioFingerprintService _audioFingerprintService;
+        private readonly IFingerprintRepository _fingerprintRepository;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ProcessYoutubeService _youtubeService;
 
-        public SongService(ISongRepository songRepository, IAudioFingerprintService audioFingerprintService, IUnitOfWork unitOfWork, ProcessYoutubeService youtubeService)
+        public SongService(ISongRepository songRepository, IAudioFingerprintService audioFingerprintService, IFingerprintRepository fingerprintRepository, IUnitOfWork unitOfWork, ProcessYoutubeService youtubeService)
         {
             _songRepository = songRepository;
             _audioFingerprintService = audioFingerprintService;
             _unitOfWork = unitOfWork;
             _youtubeService = youtubeService;
+            _fingerprintRepository = fingerprintRepository;
         }
         //TODO: first store metadata only in database, next fingerprint
         public async Task<SongResponse> AddSongAsync(string url, CancellationToken ct = default)
@@ -47,12 +49,14 @@ namespace Shazam.Application.Services.Songs
             await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
 
             _songRepository.AddSong(song);
-
             await _unitOfWork.SaveChangesAsync(ct);
 
             // generate fingerprint hashes
 
-            var fingetprints = await _audioFingerprintService.GenerateHashesAsync(fileName);
+            var hashes = await _audioFingerprintService.GenerateHashesAsync(fileName);
+
+            // sotore in redis
+            await _fingerprintRepository.StoreHashesAsync(song.Id, hashes);
 
             return song.Adapt<SongResponse>();
         }

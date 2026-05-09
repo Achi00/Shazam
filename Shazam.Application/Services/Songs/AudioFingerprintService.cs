@@ -22,9 +22,7 @@ namespace Shazam.Application.Services.Songs
             // connect peaks, generate audio fingerprint
             var fingerPrints = new PeakPairing().Pear(peaks);
 
-            var hashes = fingerPrints.ToDictionary(f => f.Hash.ToString("X8"), f => f.AnchorTime);
-
-            Console.WriteLine($"Fingerprints count: {fingerPrints.Count}");
+            var hashes = fingerPrints.GroupBy(f => f.Hash.ToString("X8")).ToDictionary(g => g.Key, g => g.First().AnchorTime);
 
             return Task.FromResult(hashes);
         }

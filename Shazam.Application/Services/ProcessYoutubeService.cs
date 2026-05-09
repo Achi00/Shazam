@@ -45,7 +45,7 @@ namespace Shazam.Application.Services
             song.Title = video.Title;
             song.Author = video.Author.ToString();
             song.Duration = video.Duration;
-            song.ThumbnailUrl = video.Thumbnails.TryGetWithHighestResolution().Url;
+            song.ThumbnailUrl = video?.Thumbnails?.TryGetWithHighestResolution()?.Url ?? "";
             song.YoutubeUrl = url;
 
             return (song, audioStream);
