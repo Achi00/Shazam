@@ -4,6 +4,7 @@ using Shazam.Application.DTOs.Song;
 using Shazam.Application.Exceptions;
 using Shazam.Application.Interfaces;
 using Shazam.Application.Interfaces.Repository;
+using Shazam.Application.Interfaces.Service;
 using Shazam.Application.Interfaces.Service.Song;
 using Shazam.Application.Peaks;
 using Shazam.Application.Spectogram;
@@ -13,12 +14,14 @@ namespace Shazam.Application.Services.Songs
     public class SongService : ISongService
     {
         private readonly ISongRepository _songRepository;
+        private readonly IAudioFingerprintService _audioFingerprintService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ProcessYoutubeService _youtubeService;
 
-        public SongService(ISongRepository songRepository, IUnitOfWork unitOfWork, ProcessYoutubeService youtubeService)
+        public SongService(ISongRepository songRepository, IAudioFingerprintService audioFingerprintService, IUnitOfWork unitOfWork, ProcessYoutubeService youtubeService)
         {
             _songRepository = songRepository;
+            _audioFingerprintService = audioFingerprintService;
             _unitOfWork = unitOfWork;
             _youtubeService = youtubeService;
         }
@@ -47,26 +50,9 @@ namespace Shazam.Application.Services.Songs
 
             await _unitOfWork.SaveChangesAsync(ct);
 
-            // generate fingerprints
-            var loader = new LoadAudioFiles();
-            // TODO: fix path later, now for testing!!!
-            float[] samples = loader.ProcessAudioSample($"D:{fileName}");
+            // generate fingerprint hashes
 
-            // generate spectpgram
-            var stft = new STFT();
-            float[,] spectogram = stft.ComputeSpectrogram(samples);
-
-            // detect audio peaks
-            var pd = new PeakDetection();
-            var peaks = pd.FindPeaks(spectogram);
-
-            Console.WriteLine($"Peaks count: {peaks.Count}");
-
-            // connect peaks, generate audio fingerprint
-            var peakPearing = new PeakPairing();
-            var fingerPrints = peakPearing.Pear(peaks);
-
-            Console.WriteLine($"Fingerprints count: {fingerPrints.Count}");
+            var fingetprints = await _audioFingerprintService.GenerateHashesAsync(fileName);
 
             return song.Adapt<SongResponse>();
         }
