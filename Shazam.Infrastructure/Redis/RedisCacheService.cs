@@ -1,23 +1,39 @@
 ﻿using Shazam.Application.Interfaces.Services;
+using StackExchange.Redis;
+using System.Text.Json;
 
 namespace Shazam.Infrastructure.Redis
 {
     public class RedisCacheService : ICacheService
     {
+        private readonly IDatabase _database;
 
-        public Task<T?> GetAsync<T>(string key)
+        public RedisCacheService(IConnectionMultiplexer redis)
         {
-            throw new NotImplementedException();
+            _database = redis.GetDatabase();
         }
 
-        public Task RemoveAsync(string key)
+        public async Task<T?> GetAsync<T>(string key)
         {
-            throw new NotImplementedException();
+            var value = await _database.StringGetAsync(key);
+
+            if (value.IsNullOrEmpty)
+            {
+                return default;
+            }
+
+            return JsonSerializer.Deserialize<T>(value!);
         }
 
-        public Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
+        public async Task SetAsync<T>(string key, T value, TimeSpan? expiry = null)
         {
-            throw new NotImplementedException();
+            var json = JsonSerializer.Serialize(value);
+            await _database.StringSetAsync(key, json, expiry ?? TimeSpan.FromHours(1));
+        }
+
+        public async Task RemoveAsync(string key)
+        {
+            await _database.KeyDeleteAsync(key);
         }
     }
 }

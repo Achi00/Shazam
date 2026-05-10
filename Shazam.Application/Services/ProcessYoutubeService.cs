@@ -6,7 +6,7 @@ using YoutubeExplode.Videos.Streams;
 namespace Shazam.Application.Services
 {
     // is part of data collecting pipeline
-    public class ProcessYoutube
+    public class ProcessYoutubeService
     {
         private static readonly YoutubeClient _youtubeClient = new YoutubeClient();
 
@@ -25,7 +25,7 @@ namespace Shazam.Application.Services
             await _youtubeClient.Videos.Streams.DownloadAsync(streamInfo, filePath);
         }
 
-        public async Task<(Song song, IStreamInfo audioStream)> GetMetaDataAsync(string url)
+        public async Task<(Song song, IStreamInfo audioStream)> GetMetaDataAsync(string url, CancellationToken ct = default)
         {
             if (string.IsNullOrWhiteSpace(url))
             {
@@ -34,10 +34,10 @@ namespace Shazam.Application.Services
 
             Console.WriteLine("Collectiong songs metadata");
             // get video metadata
-            var video = await _youtubeClient.Videos.GetAsync(url);
+            var video = await _youtubeClient.Videos.GetAsync(url, ct);
 
             // get streams
-            var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(url);
+            var streamManifest = await _youtubeClient.Videos.Streams.GetManifestAsync(url, ct);
             var audioStream = streamManifest.GetAudioOnlyStreams().GetWithHighestBitrate();
 
             var song = new Song();
@@ -45,7 +45,8 @@ namespace Shazam.Application.Services
             song.Title = video.Title;
             song.Author = video.Author.ToString();
             song.Duration = video.Duration;
-            song.ThumbnailUrl = video.Thumbnails.TryGetWithHighestResolution().Url;
+            song.ThumbnailUrl = video?.Thumbnails?.TryGetWithHighestResolution()?.Url ?? "";
+            song.YoutubeUrl = url;
 
             return (song, audioStream);
         }

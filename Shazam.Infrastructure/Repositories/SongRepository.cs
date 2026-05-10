@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Mapster;
+using Microsoft.EntityFrameworkCore;
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Domain.Entity;
@@ -19,9 +20,9 @@ namespace Shazam.Infrastructure.Repositories
             _context.Songs.Add(song);
         }
 
-        public async Task<List<Song>> GetAllSongs(CancellationToken ct = default)
+        public async Task<List<SongResponse>> GetAllSongs(CancellationToken ct = default)
         {
-            return await _context.Songs.AsNoTracking().ToListAsync(ct);
+            return await _context.Songs.AsNoTracking().ProjectToType<SongResponse>().ToListAsync(ct);
         }
 
         public async Task<Song?> GetForUpdateAsync(int id, CancellationToken ct = default)
@@ -32,6 +33,11 @@ namespace Shazam.Infrastructure.Repositories
         public async Task<Song?> GetSongById(int id, CancellationToken ct = default)
         {
             return await _context.Songs.AsNoTracking().FirstOrDefaultAsync(s => s.Id == id, ct);
+        }
+
+        public async Task<bool> ExistsByYoutubeUrlAsync(string url, CancellationToken ct = default)
+        {
+            return await _context.Songs.AsNoTracking().AnyAsync(s => s.YoutubeUrl == url, ct);
         }
 
         public void RemoveSong(Song song)

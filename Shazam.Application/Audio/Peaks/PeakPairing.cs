@@ -1,4 +1,4 @@
-﻿using Shazam.Application.Hashing;
+﻿using Shazam.Application.Audio.Hashing;
 
 namespace Shazam.Application.Peaks
 {

@@ -100,14 +100,42 @@
 
 // ========================= get data from youtube url =========================
 
+using Shazam.Application.Audio;
+using Shazam.Application.Audio.Spectogram;
+using Shazam.Application.Peaks;
 using Shazam.Application.Services;
 
-var youtubeService = new ProcessYoutube();
+var youtubeService = new ProcessYoutubeService();
 
 var (song, streamInfo) = await youtubeService.GetMetaDataAsync("https://www.youtube.com/watch?v=zBUx6zTxr98");
+
+Console.WriteLine(song.Title);
+Console.WriteLine(song.ThumbnailUrl);
+Console.WriteLine(song.Author);
+Console.WriteLine(song.Duration);
 
 // testing, random file names
 string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
 
 // download audio
 await youtubeService.DownloadStreamAsync(streamInfo, fileName);
+
+// load downloaded audio file
+var loader = new LoadAudioFiles();
+float[] samples = loader.ProcessAudioSample($"D:{fileName}");
+
+// generate spectpgram
+var stft = new STFT();
+float[,] spectogram = stft.ComputeSpectrogram(samples);
+
+// detect audio peaks
+var pd = new PeakDetection();
+var peaks = pd.FindPeaks(spectogram);
+
+Console.WriteLine($"Peaks count: {peaks.Count}");
+
+// connect peaks, generate audio fingerprint
+var peakPearing = new PeakPairing();
+var fingerPrints = peakPearing.Pear(peaks);
+
+Console.WriteLine($"Fingerprints count: {fingerPrints.Count}");
