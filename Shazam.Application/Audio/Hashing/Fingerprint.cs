@@ -1,4 +1,4 @@
-﻿namespace Shazam.Application.Hashing
+﻿namespace Shazam.Application.Audio.Hashing
 {
     public record Fingerprint(int Freq1, int Freq2, int DeltaTime, int AnchorTime)
     {

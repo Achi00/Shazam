@@ -1,7 +1,7 @@
 ﻿using Shazam.Application.Audio;
+using Shazam.Application.Audio.Spectogram;
 using Shazam.Application.Interfaces.Service;
 using Shazam.Application.Peaks;
-using Shazam.Application.Spectogram;
 
 namespace Shazam.Application.Services.Songs
 {
@@ -23,6 +23,9 @@ namespace Shazam.Application.Services.Songs
             var fingerPrints = new PeakPairing().Pear(peaks);
 
             var hashes = fingerPrints.GroupBy(f => f.Hash.ToString("X8")).ToDictionary(g => g.Key, g => g.First().AnchorTime);
+
+            // test
+            Console.WriteLine(hashes.FirstOrDefault());
 
             return Task.FromResult(hashes);
         }

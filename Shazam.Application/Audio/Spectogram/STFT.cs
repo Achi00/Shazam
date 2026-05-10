@@ -1,6 +1,6 @@
 ﻿using NAudio.Dsp;
 
-namespace Shazam.Application.Spectogram
+namespace Shazam.Application.Audio.Spectogram
 {
     public class STFT
     {

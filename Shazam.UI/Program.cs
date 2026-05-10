@@ -101,9 +101,9 @@
 // ========================= get data from youtube url =========================
 
 using Shazam.Application.Audio;
+using Shazam.Application.Audio.Spectogram;
 using Shazam.Application.Peaks;
 using Shazam.Application.Services;
-using Shazam.Application.Spectogram;
 
 var youtubeService = new ProcessYoutubeService();
 

@@ -1,13 +1,10 @@
 ﻿using Mapster;
-using Shazam.Application.Audio;
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Exceptions;
 using Shazam.Application.Interfaces;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service;
 using Shazam.Application.Interfaces.Service.Song;
-using Shazam.Application.Peaks;
-using Shazam.Application.Spectogram;
 
 namespace Shazam.Application.Services.Songs
 {
@@ -27,38 +24,61 @@ namespace Shazam.Application.Services.Songs
             _youtubeService = youtubeService;
             _fingerprintRepository = fingerprintRepository;
         }
-        //TODO: first store metadata only in database, next fingerprint
+        // TODO: first store metadata only in database, next fingerprint
+        // TODO: add rollback logic
         public async Task<SongResponse> AddSongAsync(string url, CancellationToken ct = default)
         {
-            //TODO: add sql transaction and rollbacks on fail
-            // get add data from youtube url
-            var (song, streamInfo) = await _youtubeService.GetMetaDataAsync(url, ct);
-            //var song = dto.Adapt<Song>();
-            var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
-
-            if (exists)
+            string? fileName = null;
+            try
             {
-                throw new AlreadyExistsException($"Song with Url: {song.YoutubeUrl} already added in database");
+                //TODO: add sql transaction and rollbacks on fail
+                // get add data from youtube url
+                var (song, streamInfo) = await _youtubeService.GetMetaDataAsync(url, ct);
+
+                // duplicate check
+                var exists = await _songRepository.ExistsByYoutubeUrlAsync(song.YoutubeUrl, ct);
+
+                if (exists)
+                {
+                    throw new AlreadyExistsException($"Song with Url: {song.YoutubeUrl} already added in database");
+                }
+
+                // download file
+                // TODO: fix path later
+                fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
+
+                /// TODO: remove audio later, clean up!!!
+                await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
+
+                // generate fingerprint hashes
+
+                var hashes = await _audioFingerprintService.GenerateHashesAsync(fileName);
+
+                // start sql transaction
+                await _unitOfWork.BeginTransactionAsync(ct);
+
+                _songRepository.AddSong(song);
+                await _unitOfWork.SaveChangesAsync(ct);
+
+                // sotore in redis
+                await _fingerprintRepository.StoreHashesAsync(song.Id, hashes);
+
+                // commit sql
+                await _unitOfWork.CommitTransactionAsync(ct);
+
+                return song.Adapt<SongResponse>();
             }
+            catch
+            {
+                await _unitOfWork.RollbackTransactionAsync(ct);
 
-            // TODO: fix path later
-            string fileName = $"/audio/{Guid.NewGuid()}.{streamInfo.Container}";
-
-            /// TODO: remove audio later, clean up!!!
-            // download audio
-            await _youtubeService.DownloadStreamAsync(streamInfo, fileName);
-
-            _songRepository.AddSong(song);
-            await _unitOfWork.SaveChangesAsync(ct);
-
-            // generate fingerprint hashes
-
-            var hashes = await _audioFingerprintService.GenerateHashesAsync(fileName);
-
-            // sotore in redis
-            await _fingerprintRepository.StoreHashesAsync(song.Id, hashes);
-
-            return song.Adapt<SongResponse>();
+                // clean up file
+                if (fileName != null && File.Exists(fileName))
+                {
+                    File.Delete(fileName);
+                }
+                throw;
+            }
         }
 
         public async Task<List<SongResponse>> GetAllAsync(CancellationToken ct = default)
