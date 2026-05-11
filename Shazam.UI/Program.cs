@@ -24,3 +24,5 @@ recordAudio.StartRecording(cts.Token);
 
 // block main thread untill match is found
 await recordAudio.WaitForResultAsync();
+
+Console.ReadKey();

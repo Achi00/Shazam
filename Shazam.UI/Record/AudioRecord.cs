@@ -1,4 +1,6 @@
 ﻿using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
+using Shazam.Application.Audio.Helpers;
 using Shazam.Application.Audio.Spectogram;
 using Shazam.Application.Peaks;
 using System.Net.Http.Json;
@@ -34,6 +36,7 @@ namespace Shazam.UI.Record
                 _accumulated.AddRange(e.Buffer[..e.BytesRecorded]);
                 if (_accumulated.Count >= chunkSize)
                 {
+                    // samples matching ProcessAudioSample sample paramaters which is stored in redis
                     var samples = ConvertToSamples(_accumulated.ToArray(), _capture.WaveFormat);
                     _accumulated.Clear();
 
@@ -82,8 +85,33 @@ namespace Shazam.UI.Record
             {
                 raw[i] = BitConverter.ToSingle(buffer, i * 4);
             }
-
+            // be able to process with NAudio
             var provider = new RawSampleProvider(raw, format);
+
+            // 8 channel to single
+            ISampleProvider mono = format.Channels == 1 ? provider : new MultiChannelToMonoSampleProvider(provider);
+
+            // resample to 16000Hz
+            ISampleProvider resampled = mono.WaveFormat.SampleRate == 16000 ? mono : new WdlResamplingSampleProvider(mono, 16000);
+
+            // read resampled mono samples
+            var res = new List<float>();
+            var buf = new float[4096];
+            int read;
+
+            while ((read = resampled.Read(buf, 0, buf.Length)) > 0)
+            {
+                res.AddRange(buf[..read]);
+            }
+
+            // normalize same as our audio load pipeline
+            float max = res.Max(Math.Abs);
+
+            if (max > 0)
+                for (int i = 0; i < res.Count; i++)
+                    res[i] /= max;
+
+            return res.ToArray();
         }
 
         private Dictionary<string, int> GenerateHashes(float[] samples)
