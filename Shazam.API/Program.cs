@@ -2,9 +2,11 @@ using Microsoft.EntityFrameworkCore;
 using Shazam.Application.Interfaces;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service;
+using Shazam.Application.Interfaces.Service.Match;
 using Shazam.Application.Interfaces.Service.Song;
 using Shazam.Application.Interfaces.Services;
 using Shazam.Application.Services;
+using Shazam.Application.Services.Match;
 using Shazam.Application.Services.Songs;
 using Shazam.Infrastructure.Redis;
 using Shazam.Infrastructure.Repositories;
@@ -29,7 +31,10 @@ builder.Services.AddScoped<ISongService, SongService>();
 builder.Services.AddScoped<ISongRepository, SongRepository>();
 builder.Services.AddScoped<IAudioFingerprintService, AudioFingerprintService>();
 builder.Services.AddScoped<IFingerprintRepository, RedisFingerprintRepository>();
+
 builder.Services.AddScoped<ProcessYoutubeService>();
+
+builder.Services.AddScoped<ISongMatchingService, SongMatchingService>();
 
 builder.Services.AddScoped<ICacheService, RedisCacheService>();
 
