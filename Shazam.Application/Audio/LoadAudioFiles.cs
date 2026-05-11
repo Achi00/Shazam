@@ -22,7 +22,7 @@ namespace Shazam.Application.Audio
                 };
             }
 
-            // // resample, keep all in consistant Hz
+            //resample, keep all in consistant Hz
             int targetSampleRate = 16000;
             if (provider.WaveFormat.SampleRate != targetSampleRate)
             {
