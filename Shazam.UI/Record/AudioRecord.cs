@@ -2,33 +2,42 @@
 
 namespace Shazam.UI.Record
 {
-    public static class AudioRecord
+    public class AudioRecord
     {
-        public static void RecordAudio()
+        private WasapiLoopbackCapture capture;
+        private WaveFileWriter writer;
+        private readonly ManualResetEventSlim _stopped = new(false);
+
+        public void StartRecording(string outputFilePath)
         {
-            var waveIn = new WaveInEvent();
-            waveIn.WaveFormat = new WaveFormat(44100, 1);
+            _stopped.Reset();
 
-            var writer = new WaveFileWriter("recording.wav", waveIn.WaveFormat);
+            // capture from output device/speaker not mic
+            capture = new WasapiLoopbackCapture();
 
-            // incoming data
-            waveIn.DataAvailable += (s, e) =>
+            writer = new WaveFileWriter(outputFilePath, capture.WaveFormat);
+
+            capture.DataAvailable += (s, e) =>
             {
                 writer.Write(e.Buffer, 0, e.BytesRecorded);
             };
 
-            // stop recording
-            waveIn.RecordingStopped += (s, e) =>
+            capture.RecordingStopped += (s, e) =>
             {
-                waveIn.Dispose();
+                writer?.Dispose();
+                writer = null;
+                capture.Dispose();
+                _stopped.Set();
             };
 
-            waveIn.StartRecording();
-            Console.WriteLine("• Recording audio");
-            Console.WriteLine("Press any button to stop");
-            Console.ReadLine();
-            waveIn.StopRecording();
-            waveIn.Dispose();
+            capture.StartRecording();
+        }
+
+        public void StopRecording()
+        {
+            capture?.StopRecording();
+            // block until capture.RecordingStopped fires and writer is flushed
+            _stopped.Wait();
         }
     }
 }
