@@ -72,12 +72,18 @@ namespace Shazam.UI.Record
             _capture?.StopRecording();
         }
 
+        // match sample convertion to our ProcessAudioSample method parameters
+        // 1 channel, 16000 Hz
         private float[] ConvertToSamples(byte[] buffer, WaveFormat format)
         {
-            var samples = new float[buffer.Length / 4];
-            for (int i = 0; i < samples.Length; i++)
-                samples[i] = BitConverter.ToSingle(buffer, i * 4);
-            return samples;
+            var raw = new float[buffer.Length / 4];
+
+            for (int i = 0; i < raw.Length; i++)
+            {
+                raw[i] = BitConverter.ToSingle(buffer, i * 4);
+            }
+
+            var provider = new RawSampleProvider(raw, format);
         }
 
         private Dictionary<string, int> GenerateHashes(float[] samples)
