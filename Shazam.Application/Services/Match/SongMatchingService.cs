@@ -2,6 +2,8 @@
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service.Match;
+using Shazam.Domain.Entity;
+using System.Text.RegularExpressions;
 
 namespace Shazam.Application.Services.Match
 {
@@ -59,10 +61,15 @@ namespace Shazam.Application.Services.Match
             // fetch winner song
             var song = await _songRepository.GetSongById(winner.Key.SongId, ct);
 
-            Console.WriteLine("Time delta:" + winner.Key.TimeDelta * 32);
+            var matchMs = AudioTime.FrameToMs(winner.Key.TimeDelta);
 
+            Console.WriteLine($"Match position: {TimeSpan.FromMilliseconds(matchMs)}");
 
-            return song.Adapt<SongResponse>();
+            var response = song.Adapt<SongResponse>();
+
+            response.MatchPositionMs = matchMs;
+
+            return response;
         }
     }
 }

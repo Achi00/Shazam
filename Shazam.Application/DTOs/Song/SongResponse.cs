@@ -8,6 +8,10 @@
         public string YoutubeUrl { get; set; }
         public string? ThumbnailUrl { get; set; }
         public TimeSpan? Duration { get; set; }
-        public float TimeDelta { get; set; }
+        public double MatchPositionMs { get; set; }
+        public string MatchPosition =>
+        TimeSpan
+            .FromMilliseconds(MatchPositionMs)
+            .ToString(@"mm\:ss");
     }
 }
