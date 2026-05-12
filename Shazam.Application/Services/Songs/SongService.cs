@@ -24,7 +24,6 @@ namespace Shazam.Application.Services.Songs
             _youtubeService = youtubeService;
             _fingerprintRepository = fingerprintRepository;
         }
-        // TODO: first store metadata only in database, next fingerprint
         // TODO: add rollback logic
         public async Task<SongResponse> AddSongAsync(string url, CancellationToken ct = default)
         {

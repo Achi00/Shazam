@@ -46,6 +46,7 @@ namespace Shazam.Application.Services.Match
                 return null;
             }
 
+
             // get single audio with most vote cound
             var winner = votes.MaxBy(v => v.Value);
 
@@ -57,6 +58,9 @@ namespace Shazam.Application.Services.Match
 
             // fetch winner song
             var song = await _songRepository.GetSongById(winner.Key.SongId, ct);
+
+            Console.WriteLine("Time delta:" + winner.Key.TimeDelta);
+
 
             return song.Adapt<SongResponse>();
         }

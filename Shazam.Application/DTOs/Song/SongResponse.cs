@@ -8,5 +8,6 @@
         public string YoutubeUrl { get; set; }
         public string? ThumbnailUrl { get; set; }
         public TimeSpan? Duration { get; set; }
+        public float TimeDelta { get; set; }
     }
 }
