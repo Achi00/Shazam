@@ -31,7 +31,7 @@ namespace Shazam.Application.Services.Match
                 foreach (var entry in candidates)
                 {
                     // timeDelta = how far into the original song this snippet sits
-                    var deltaTime = entry.TimeOffsetMs - queryOffset;
+                    var deltaTime = entry.TimeOffsetFrame - queryOffset;
                     var key = (entry.SongId, deltaTime);
 
                     votes.TryGetValue(key, out var count);
@@ -59,7 +59,7 @@ namespace Shazam.Application.Services.Match
             // fetch winner song
             var song = await _songRepository.GetSongById(winner.Key.SongId, ct);
 
-            Console.WriteLine("Time delta:" + winner.Key.TimeDelta);
+            Console.WriteLine("Time delta:" + winner.Key.TimeDelta * 32);
 
 
             return song.Adapt<SongResponse>();
