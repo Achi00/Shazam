@@ -14,7 +14,7 @@
             int sampleRate = 16000,
             int hopSize = 512)
         {
-            return (frame * hopSize * 1000.0 / sampleRate) / 1000;
+            return (double)frame * hopSize / sampleRate;
         }
     }
 }
