@@ -2,6 +2,8 @@
 using Shazam.Application.DTOs.Song;
 using Shazam.Application.Interfaces.Repository;
 using Shazam.Application.Interfaces.Service.Match;
+using Shazam.Domain.Entity;
+using System.Text.RegularExpressions;
 
 namespace Shazam.Application.Services.Match
 {
@@ -31,7 +33,7 @@ namespace Shazam.Application.Services.Match
                 foreach (var entry in candidates)
                 {
                     // timeDelta = how far into the original song this snippet sits
-                    var deltaTime = entry.TimeOffsetMs - queryOffset;
+                    var deltaTime = entry.TimeOffsetFrame - queryOffset;
                     var key = (entry.SongId, deltaTime);
 
                     votes.TryGetValue(key, out var count);
@@ -46,6 +48,7 @@ namespace Shazam.Application.Services.Match
                 return null;
             }
 
+
             // get single audio with most vote cound
             var winner = votes.MaxBy(v => v.Value);
 
@@ -58,7 +61,18 @@ namespace Shazam.Application.Services.Match
             // fetch winner song
             var song = await _songRepository.GetSongById(winner.Key.SongId, ct);
 
-            return song.Adapt<SongResponse>();
+            var matchSec = AudioTime.FrameToSec(winner.Key.TimeDelta);
+
+            var response = song.Adapt<SongResponse>();
+
+            if (!string.IsNullOrWhiteSpace(response.YoutubeUrl))
+            {
+                response.YoutubeUrl += $"&t={(int)matchSec}";
+            }
+
+            response.MatchPositionMs = matchSec;
+
+            return response;
         }
     }
 }

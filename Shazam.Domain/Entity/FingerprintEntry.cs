@@ -4,6 +4,6 @@
     {
         public int SongId { get; set; }
         // where in the song this hash appares
-        public int TimeOffsetMs { get; set; }
+        public int TimeOffsetFrame { get; set; }
     }
 }
