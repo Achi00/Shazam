@@ -58,16 +58,21 @@ namespace Shazam.Application.Services.Match
                 return null;
             }
 
+            var matchFrame = Math.Abs(winner.Key.TimeDelta);
+
             // fetch winner song
             var song = await _songRepository.GetSongById(winner.Key.SongId, ct);
 
-            var matchMs = AudioTime.FrameToMs(winner.Key.TimeDelta);
-
-            Console.WriteLine($"Match position: {TimeSpan.FromMilliseconds(matchMs)}");
+            var matchSec = AudioTime.FrameToSec(matchFrame);
 
             var response = song.Adapt<SongResponse>();
 
-            response.MatchPositionMs = matchMs;
+            if (!string.IsNullOrWhiteSpace(response.YoutubeUrl))
+            {
+                response.YoutubeUrl += $"&t={matchSec}s";
+            }
+
+            response.MatchPositionMs = matchSec;
 
             return response;
         }
